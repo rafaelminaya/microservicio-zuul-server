@@ -1,6 +1,7 @@
 package com.formacionbdi.springboot.app.zuul.oauth;
 
 import java.util.Arrays;
+import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -52,7 +53,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
         http.authorizeRequests(requests -> requests.antMatchers("/api/security/oauth/**").permitAll() // asignamos nuestras rutas públicas
                 .antMatchers(HttpMethod.GET, "/api/productos/listar", "/api/items/listar", "/api/usuarios/usuarios").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/productos/ver/{id}", "/api/productos/ver/{id}/cantidad{cantidad}", "/api/usuarios/usuarios/{id}").hasAnyRole("ADMIN", "USER")
+                .antMatchers(HttpMethod.GET, "/api/productos/ver/{id}", "/api/items/ver/{id}/cantidad/{cantidad}", "/api/usuarios/usuarios/{id}").hasAnyRole("ADMIN", "USER")
                 // 1° Opción
                 .antMatchers("/api/productos/**", "/api/items/**", "/api/usuarios/**").hasRole("ADMIN")
                 // 2° Opción
@@ -106,8 +107,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		
 		JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
 	
-		// Asignamos el "codigo secreto" para la firma del JWT.
-		accessTokenConverter.setSigningKey(this.jwtKey);
+		// Asignamos el "codigo secreto" para la firma del JWT y lo codificamos a "Base64".
+		accessTokenConverter.setSigningKey(Base64.getEncoder().encodeToString(this.jwtKey.getBytes()));
 		return accessTokenConverter;
 		
 	}
